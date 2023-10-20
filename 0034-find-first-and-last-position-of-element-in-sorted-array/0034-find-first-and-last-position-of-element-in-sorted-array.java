@@ -1,4 +1,4 @@
-class Solution {
+public class Solution {
     public int[] searchRange(int[] nums, int target) {
         int[] result = {-1, -1};
         int left = binarySearch(nums, target, true);
