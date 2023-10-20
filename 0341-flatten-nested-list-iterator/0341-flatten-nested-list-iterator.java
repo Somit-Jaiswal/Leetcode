@@ -1,4 +1,4 @@
-class NestedIterator {
+public class NestedIterator {
     private List<Integer> flattened;
     private int index;
 
