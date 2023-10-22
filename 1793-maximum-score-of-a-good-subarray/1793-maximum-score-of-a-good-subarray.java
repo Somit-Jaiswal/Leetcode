@@ -1,27 +1,19 @@
-class Solution {
+public class Solution {
     public int maximumScore(int[] nums, int k) {
-        int n = nums.length;
-        int[] left = new int[n];
-        Arrays.fill(left, -1);
-        Stack<Integer> stack = new Stack();
-        for(int i = n-1; i>=0; i--){
-            while(!stack.isEmpty() && nums[stack.peek()] > nums[i])
-                left[stack.pop()]=i;
-            stack.push(i);
+        int left = k, right = k;
+        int min_val = nums[k];
+        int max_score = min_val;
+
+        while (left > 0 || right < nums.length - 1) {
+            if (left == 0 || (right < nums.length - 1 && nums[right + 1] > nums[left - 1])) {
+                right++;
+            } else {
+                left--;
+            }
+            min_val = Math.min(min_val, Math.min(nums[left], nums[right]));
+            max_score = Math.max(max_score, min_val * (right - left + 1));
         }
-        int[] right = new int[n];
-        Arrays.fill(right, n);
-        stack = new Stack();
-        for(int i = 0; i <n; i++){
-            while(!stack.isEmpty() && nums[stack.peek()]>nums[i])
-                right[stack.pop()]=i;
-            stack.push(i);
-        }
-        int result = 0;
-        for(int i=0; i < n; i++){
-            if (left[i]<k && right[i]>k)
-                result = Math.max(result, nums[i]*(right[i]-left[i]-1));
-        }
-        return result;
+        
+        return max_score;
     }
 }
