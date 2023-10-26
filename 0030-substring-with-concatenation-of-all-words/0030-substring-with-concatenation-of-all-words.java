@@ -1,35 +1,30 @@
 class Solution {
     public List<Integer> findSubstring(String s, String[] words) {
-        List<Integer> list = new ArrayList<>();
-        // Create a HashMap to store the frequency of each word in words array
-        HashMap<String, Integer> wordMap = new HashMap<>();
-        for (String w : words) wordMap.put(w, wordMap.getOrDefault(w, 0) + 1);
-
-        int wordSize = words[0].length();
-        int windowSize = words.length * wordSize;
-        // Iterate through the string s from index 0 to s.length() - windowSize
-        for (int i = 0; i <= s.length() - windowSize; i++) {
-            // Create a new HashMap for each window to track word frequencies
-            HashMap<String, Integer> map = new HashMap<>(wordMap);
-            int left = i; // Initialize left pointer for the window
-            int match = 0; // Keep track of matching words in the window
-
-            // Iterate through the window, word by word
-            for (int right = i; right <= i + windowSize - wordSize; right += wordSize) {
-                // Extract the current word from the window
-                String rightWord = s.substring(right, right + wordSize);
-                // Check if the word exists in the map
-                if (map.containsKey(rightWord)) {
-                    map.put(rightWord, map.get(rightWord) - 1); // Decrement frequency
-                    // If frequency becomes 0, increment the match count
-                    if (map.get(rightWord) == 0) match++;
+        final Map<String, Integer> counts = new HashMap<>();
+        for (final String word : words) {
+            counts.put(word, counts.getOrDefault(word, 0) + 1);
+        }
+        final List<Integer> indexes = new ArrayList<>();
+        final int n = s.length(), num = words.length, len = words[0].length();
+        for (int i = 0; i < n - num * len + 1; i++) {
+            final Map<String, Integer> seen = new HashMap<>();
+            int j = 0;
+            while (j < num) {
+                final String word = s.substring(i + j * len, i + (j + 1) * len);
+                if (counts.containsKey(word)) {
+                    seen.put(word, seen.getOrDefault(word, 0) + 1);
+                    if (seen.get(word) > counts.getOrDefault(word, 0)) {
+                        break;
+                    }
+                } else {
+                    break;
                 }
-                // If all words in the window match, add left to the result list and break
-                if (match == map.size()) {
-                    list.add(left);  break;
-                }
+                j++;
+            }
+            if (j == num) {
+                indexes.add(i);
             }
         }
-        return list;
+        return indexes;
     }
 }
