@@ -1,43 +1,63 @@
-public class Solution {
-public int maximalRectangle(char[][] matrix) {
-    if(matrix == null || matrix.length == 0 || matrix[0].length == 0) return 0;
-    
-    int[] height = new int[matrix[0].length];
-    for(int i = 0; i < matrix[0].length; i ++){
-        if(matrix[0][i] == '1') height[i] = 1;
-    }
-    int result = largestInLine(height);
-    for(int i = 1; i < matrix.length; i ++){
-        resetHeight(matrix, height, i);
-        result = Math.max(result, largestInLine(height));
-    }
-    
-    return result;
-}
+class Solution {
+    public int maximalRectangle(char[][] matrix) {
+        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
+            return 0;
+        }
 
-private void resetHeight(char[][] matrix, int[] height, int idx){
-    for(int i = 0; i < matrix[0].length; i ++){
-        if(matrix[idx][i] == '1') height[i] += 1;
-        else height[i] = 0;
-    }
-}    
+        int m = matrix.length;
+        int n = matrix[0].length;
 
-public int largestInLine(int[] height) {
-    if(height == null || height.length == 0) return 0;
-    int len = height.length;
-    Stack<Integer> s = new Stack<Integer>();
-    int maxArea = 0;
-    for(int i = 0; i <= len; i++){
-        int h = (i == len ? 0 : height[i]);
-        if(s.isEmpty() || h >= height[s.peek()]){
-            s.push(i);
-        }else{
-            int tp = s.pop();
-            maxArea = Math.max(maxArea, height[tp] * (s.isEmpty() ? i : i - 1 - s.peek()));
-            i--;
+        int[] heights = new int[n];
+        int[] leftBoundaries = new int[n];
+        int[] rightBoundaries = new int[n];
+        Arrays.fill(rightBoundaries, n);
+
+        int maxRectangle = 0;
+
+        for (int i = 0; i < m; i++) {
+            int left = 0;
+            int right = n;
+
+            updateHeightsAndLeftBoundaries(matrix[i], heights, leftBoundaries, left);
+
+            updateRightBoundaries(matrix[i], rightBoundaries, right);
+
+            maxRectangle = calculateMaxRectangle(heights, leftBoundaries, rightBoundaries, maxRectangle);
+        }
+
+        return maxRectangle;
+    }
+
+    private void updateHeightsAndLeftBoundaries(char[] row, int[] heights, int[] leftBoundaries, int left) {
+        for (int j = 0; j < heights.length; j++) {
+            if (row[j] == '1') {
+                heights[j]++;
+                leftBoundaries[j] = Math.max(leftBoundaries[j], left);
+            } else {
+                heights[j] = 0;
+                leftBoundaries[j] = 0;
+                left = j + 1;
+            }
         }
     }
-    return maxArea;
-}
+
+    private void updateRightBoundaries(char[] row, int[] rightBoundaries, int right) {
+        for (int j = rightBoundaries.length - 1; j >= 0; j--) {
+            if (row[j] == '1') {
+                rightBoundaries[j] = Math.min(rightBoundaries[j], right);
+            } else {
+                rightBoundaries[j] = right;
+                right = j;
+            }
+        }
     }
-    
+
+    private int calculateMaxRectangle(int[] heights, int[] leftBoundaries, int[] rightBoundaries, int maxRectangle) {
+        for (int j = 0; j < heights.length; j++) {
+            int width = rightBoundaries[j] - leftBoundaries[j];
+            int area = heights[j] * width;
+            maxRectangle = Math.max(maxRectangle, area);
+        }
+        return maxRectangle;
+    }
+}
