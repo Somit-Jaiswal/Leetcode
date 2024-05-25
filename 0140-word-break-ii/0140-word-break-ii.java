@@ -1,32 +1,23 @@
 class Solution {
-    private void helper(String s, int i, Set<String> dict, List<String> cur, List<String> res) {
-        if (i == s.length()) {
-            if (cur.size() > 0) {
-                StringBuilder sb = new StringBuilder();
-                for (int j = 0; j < cur.size(); j++) {
-                    if (j > 0) {
-                        sb.append(' ');
-                    }
-                    sb.append(cur.get(j));
-                }
-                res.add(sb.toString());
-            }
-            return;
-        }
-
-        for (int j = i+1; j <= s.length(); j++) {
-            if (dict.contains(s.substring(i, j))) {
-                cur.add(s.substring(i, j));
-                helper(s, j, dict, cur, res);
-                cur.remove(cur.size() - 1);
-            }
-        }
-    }
     public List<String> wordBreak(String s, List<String> wordDict) {
-        Set<String> dict = new HashSet<>(wordDict);
-        List<String> res = new ArrayList<>();
-        List<String> cur = new ArrayList<>();
-        helper(s, 0, dict, cur, res);
-        return res;
+        HashSet<String> hs = new HashSet<>(wordDict);
+        return wordBreakHelper(s, 0, hs);
+    }
+
+    private List<String> wordBreakHelper(String s, int start, HashSet<String> dict) {
+        List<String> validSubstr = new ArrayList<>();
+
+        if (start == s.length())
+            validSubstr.add("");
+        for (int end = start + 1; end <= s.length(); end++) {
+            String prefix = s.substring(start, end);
+            if (dict.contains(prefix)) {
+                List<String> suffixes = wordBreakHelper(s, end, dict);
+                for (String suffix : suffixes) {
+                    validSubstr.add(prefix + (suffix.equals("") ? "" : " ") + suffix);
+                }
+            }
+        }
+        return validSubstr;
     }
 }
